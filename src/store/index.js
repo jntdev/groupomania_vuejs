@@ -34,11 +34,14 @@ const store = createStore({
         status: '',
         user: user,
         userInfos: {
-            nom: '',
-            prenom: '',
             email: '',
-            photo: '',
+            password: '',
         },
+        postInfo: {
+            title: "",
+            content:
+                "",
+        }
     },
     mutations: {
         setStatus: function (state, status) {
@@ -99,6 +102,17 @@ const store = createStore({
                 .catch(function () {
                 });
         }
+        // newPost: ({ commit }, postInfo) => {
+        //     instance.post("/posts", postInfo)
+        //         .then(function (response) {
+        //             commit('setStatus', 'post_created');
+        //             resolve(response);
+        //         })
+        //         .catch(function (error) {
+        //             commit('setStatus', 'error_postc_reate');
+        //             reject(error);
+        //         });
+        // }
     }
 });
 export default store;

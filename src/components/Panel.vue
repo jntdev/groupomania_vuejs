@@ -1,21 +1,16 @@
 <template>
-  <section class="board">
-    <Panel />
-    <section class="all_posts">
-      <h2>Tout les posts</h2>
-      <Post />
-    </section>
-  </section>
+  <div class="left_panel">
+    <button @click="logout()" class="board_button button">Déconnexion</button>
+    <button @click="newPost()" class="new_post_button board_button button">
+      Nouveau Post
+    </button>
+  </div>
+  <hr class="board_hr" />
 </template>
 <script>
-import Post from "../components/Post.vue";
-import Panel from "../components/Panel.vue";
 export default {
-  name: "Posts",
-  components: {
-    Post,
-    Panel,
-  },
+  name: "Panel",
+  components: {},
   data() {
     return {};
   },
@@ -32,13 +27,6 @@ export default {
 };
 </script>
 <style lang="scss">
-.all_posts {
-  flex: 9;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-}
 .board {
   display: flex;
   flex: 2;

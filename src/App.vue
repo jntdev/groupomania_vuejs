@@ -37,4 +37,18 @@ body {
   color: rgb(0, 0, 0);
   font-size: 25px;
 }
+//rules
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+.flexcol {
+  display: flex;
+  flex-direction: column;
+}
+.centercenter {
+  justify-content: center;
+  align-items: center;
+}
 </style>

@@ -85,7 +85,7 @@ export default {
     ...mapState(["status"]),
   },
   methods: {
-    switchToCreateAccount: function () {
+    switchToRegister: function () {
       this.mode = "create";
     },
     switchToLogin: function () {
@@ -100,7 +100,9 @@ export default {
         })
         .then(
           function () {
+            console.log("toto");
             self.$router.push("/posts");
+            console.log("tato");
           },
           function (error) {
             console.log(error);
@@ -117,6 +119,7 @@ export default {
         .then(
           function () {
             self.login();
+            self.$router.push("/posts");
           },
           function (error) {
             console.log(error);
@@ -178,7 +181,7 @@ input {
   height: 45px;
   width: 300px;
   border-radius: 5px;
-  border: 1px solid rgba(176, 88, 88, 0.55);
+  border: 1px solid red;
 }
 .submit {
   border: none;
