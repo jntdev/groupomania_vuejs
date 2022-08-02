@@ -12,7 +12,8 @@
     "es6-promise": "^4.2.8",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "vue-toast-notification": "^3.0.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",

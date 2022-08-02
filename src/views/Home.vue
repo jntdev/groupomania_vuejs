@@ -105,7 +105,13 @@ export default {
             console.log("tato");
           },
           function (error) {
-            console.log(error);
+            if (error.message == "Request failed with status code 400") {
+              self.$toast.error("Email ou mot de passe incorrect");
+            } else {
+              self.$toast.error(
+                "Une erreur est survenue, veuillez rééssayer plus tard."
+              );
+            }
           }
         );
     },
@@ -181,7 +187,7 @@ input {
   height: 45px;
   width: 300px;
   border-radius: 5px;
-  border: 1px solid red;
+  border: 1px solid rgba(176, 88, 88, 0.55);
 }
 .submit {
   border: none;

@@ -1,11 +1,13 @@
 <template>
-  <div class="left_panel">
-    <button @click="logout()" class="board_button button">Déconnexion</button>
-    <button @click="newPost()" class="new_post_button board_button button">
-      Nouveau Post
-    </button>
+  <div class="board">
+    <hr class="board_hr" />
+    <div class="left_panel">
+      <button @click="logout()" class="board_button button">Déconnexion</button>
+      <button @click="newPost()" class="new_post_button board_button button">
+        Nouveau Post
+      </button>
+    </div>
   </div>
-  <hr class="board_hr" />
 </template>
 <script>
 export default {
@@ -29,17 +31,15 @@ export default {
 <style lang="scss">
 .board {
   display: flex;
-  flex: 2;
-  padding: 3%;
   .left_panel {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 200px;
+    min-width: 300px;
     height: 20vh;
-    justify-content: space-around;
   }
   .board_button {
+    margin-top: 50px;
     padding: 3% 6%;
   }
   .new_post_button {
@@ -47,8 +47,14 @@ export default {
   }
 }
 .board_hr {
-  margin-left: 50px;
-  height: 60vh;
-  border: solid 1px red;
+  margin-top: 0;
+  height: 80vh;
+  border: 0;
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 1) 0%,
+    rgba(122, 0, 0, 1) 20%,
+    rgba(255, 0, 0, 1) 60%
+  );
+  width: 2px;
 }
 </style>

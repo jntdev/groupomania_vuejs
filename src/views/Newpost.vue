@@ -1,7 +1,8 @@
 <template>
+  <Header />
   <section class="flexcol centercenter new_post_parent">
-    <div class="container_new_post flexcol">
-      <h1>Rédigez votre poste</h1>
+    <div class="container_new_post flexcol card">
+      <h1>Rédigez votre publication</h1>
       <input
         v-model="title"
         type="text"
@@ -22,15 +23,18 @@
       />
       <p class="caracter_limit">{{ remainingCount }}</p>
       <button @click="createPost" class="submit" type="submit">
-        <span>Poster</span>
+        <span>Publier</span>
       </button>
     </div>
   </section>
 </template>
 <script>
+import Header from "../components/Header.vue";
 export default {
   name: "newPost",
-  components: {},
+  components: {
+    Header,
+  },
   data() {
     return {
       maxCount: 280,
@@ -77,8 +81,6 @@ export default {
   align-items: flex-start;
   height: 400px;
   padding: 3%;
-  border-radius: 0 15px 15px 15px;
-  box-shadow: 5px 7px 15px -5px #000000;
   button {
     align-self: flex-end;
     padding: 2%;

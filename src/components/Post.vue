@@ -1,27 +1,31 @@
 <template>
-  <div class="post">
-    <div class="post_admin">
-      <button class="admin_post_button">modify</button>
-      <button class="admin_post_button">delete</button>
-    </div>
-    <div class="post_header">
-      <h3>toto</h3>
-      <p>Date</p>
-    </div>
-    <hr class="post_hr" />
-    <div class="post_content">
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo deleniti
-        possimus, iusto dicta aperiam nam modi ducimus aliquam ratione autem
-        placeat aspernatur accusantium ab odio quae consectetur vero? Dolorem,
-        magni.
-      </p>
-    </div>
-    <div class="post_panel">
-      <button class="comment_button button">Comment</button>
-      <div class="likes">
-        <button>Like</button>
-        <button>Dislike</button>
+  <div v-if="posts.length > 0">
+    <div v-for="(post, index) in posts" :key="index">
+      <div class="post card_border">
+        <div class="post_admin">
+          <button class="admin_post_button">modify</button>
+          <button class="admin_post_button">delete</button>
+        </div>
+        <div class="post_header">
+          <h3>toto</h3>
+          <p>Date</p>
+        </div>
+        <hr class="post_hr" />
+        <div class="post_content">
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo
+            deleniti possimus, iusto dicta aperiam nam modi ducimus aliquam
+            ratione autem placeat aspernatur accusantium ab odio quae
+            consectetur vero? Dolorem, magni.
+          </p>
+        </div>
+        <div class="post_panel">
+          <button class="comment_button button">Comment</button>
+          <div class="likes">
+            <button>Like</button>
+            <button>Dislike</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -29,19 +33,35 @@
 <script>
 export default {
   name: "Post",
-  data() {
-    return {};
+  data: function () {
+    this.getPosts();
   },
-  methods: {},
-  computed: {},
+  props: {
+    user: Object,
+  },
+  methods: {
+    getPosts() {
+      const self = this;
+      this.$store
+        .dispatch("getPosts")
+        .then()
+        .catch(
+          (error) => console.log(error)
+          //self.$toast.error("Erreur lors de la récupération des posts")
+        );
+    },
+  },
+  computed: {
+    posts() {
+      return this.$store.getters.getPosts;
+    },
+  },
 };
 </script>
 <style>
 .post {
   width: 40%;
   padding: 1% 3% 3% 3%;
-  border-radius: 15px;
-  box-shadow: 5px 7px 15px -5px #000000;
 }
 .post_header {
   display: flex;
@@ -51,7 +71,14 @@ export default {
 .post_hr {
   width: 80%;
   margin-left: 0;
-  border: solid 1px red;
+  border: 0;
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(122, 0, 0, 1) 20%,
+    rgba(255, 0, 0, 1) 40%
+  );
+  height: 2px;
 }
 .post_panel {
   display: flex;

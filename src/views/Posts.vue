@@ -1,18 +1,21 @@
 <template>
+  <Header />
   <section class="board">
-    <Panel />
     <section class="all_posts">
       <h2>Tout les posts</h2>
       <Post />
     </section>
+    <Panel />
   </section>
 </template>
 <script>
 import Post from "../components/Post.vue";
 import Panel from "../components/Panel.vue";
+import Header from "../components/Header.vue";
 export default {
   name: "Posts",
   components: {
+    Header,
     Post,
     Panel,
   },
@@ -27,8 +30,23 @@ export default {
     newPost: function () {
       this.$router.push("/newpost");
     },
+    //getPosts() {
+    //  const self = this;
+    //  this.$store
+    //    .dispatch("getPosts")
+    //    .then()
+    //    .catch(() =>
+    //      self.$toast.error("Erreur lors de la récupération des posts")
+    //    );
+    //},
   },
-  computed: {},
+  computed: {
+    posts() {
+      return this.$store.getters.getPosts;
+    },
+    //aller chercher le store
+    //aller chercher la bonne fonction
+  },
 };
 </script>
 <style lang="scss">
@@ -38,29 +56,5 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-}
-.board {
-  display: flex;
-  flex: 2;
-  padding: 3%;
-  .left_panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 200px;
-    height: 20vh;
-    justify-content: space-around;
-  }
-  .board_button {
-    padding: 3% 6%;
-  }
-  .new_post_button {
-    border-color: rgb(0, 0, 0);
-  }
-}
-.board_hr {
-  margin-left: 50px;
-  height: 60vh;
-  border: solid 1px red;
 }
 </style>
