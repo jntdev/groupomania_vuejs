@@ -22,7 +22,7 @@ export default {
       this.$router.push("/");
     },
     newPost: function () {
-      this.$router.push("/newpost");
+      this.$router.push("/postform");
     },
   },
   computed: {},

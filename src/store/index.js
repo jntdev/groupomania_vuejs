@@ -38,6 +38,14 @@ const store = createStore({
             email: '',
             is_admin: '',
         },
+        showFormList: {
+            display: false,
+            mode: "",
+            post: {
+                title: "",
+                description: "",
+            },
+        },
         postsList: [],
     },
     mutations: {
@@ -56,6 +64,7 @@ const store = createStore({
         userInfos: function (state, userInfos) {
             state.userInfos = userInfos;
         },
+
         logout: function (state) {
             state.user = {
                 userId: -1,
@@ -80,6 +89,13 @@ const store = createStore({
         deletePostOnList: function (state, postId) {
             const index = state.postsList.findIndex((post) => post.id === postId);
             state.postsList.splice(index, 1);
+        },
+        showFormList: function (state, { mode, post }) {
+            state.showFormList = {
+                display: !state.showFormList.display,
+                mode: mode,
+                post: post,
+            };
         },
     },
     actions: {
@@ -143,6 +159,7 @@ const store = createStore({
                 instance
                     .post(`posts/`, postInfos)
                     .then((response) => {
+                        commit("setPostsList", response.data);
                         //commit("addPostOnList", response.data.newPost);
                         commit("setStatus", "");
                         resolve();
@@ -172,6 +189,27 @@ const store = createStore({
                     });
             });
         },
+        modifyPost: ({ commit }, { postId, postInfos }) => {
+            commit("setStatus", "loading");
+            console.log("toto");
+            console.log(postId);
+            return new Promise((resolve, reject) => {
+                instance
+                    .put(`posts/${postId}`, postInfos)
+                    .then(() => {
+                        //commit("deletePostOnList", postId);
+                        commit("setStatus", "");
+                        resolve();
+                    })
+                    .catch((err) => {
+                        commit("setStatus", "");
+                        reject(err.message);
+
+
+
+                    });
+            });
+        },
     },
     getters: {
         getUserInfos: (state) => {
@@ -180,6 +218,9 @@ const store = createStore({
 
         getPosts: (state) => {
             return state.postsList;
+        },
+        showFormList: (state) => {
+            return state.showFormList;
         },
     },
 });

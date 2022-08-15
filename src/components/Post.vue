@@ -3,7 +3,18 @@
     <div v-for="(post, index) in posts" :key="index">
       <div class="post card_border">
         <div v-if="post.user_id == myId || myRole == 1" class="post_admin">
-          <button class="admin_post_button">modify</button>
+          <router-link
+            :to="{
+              name: 'PostformModify',
+              params: {
+                id: post.id,
+                title: post.title,
+                content: post.content,
+              },
+            }"
+          >
+            <button class="admin_post_button">modify</button>
+          </router-link>
           <button @click="deletePost(post.id)" class="admin_post_button">
             delete
           </button>
@@ -17,10 +28,16 @@
           </div>
         </div>
         <hr class="post_hr" />
-        <div class="post_content">
+        <div class="post_content" v-if="mode == 'watch'">
           <p>
             {{ post.content }}
           </p>
+        </div>
+        <div class="post_content" v-if="mode == 'modify'">
+          <textarea name="" id="" cols="30" rows="10">
+            blabla
+          </textarea>
+          <p>{{ post.content }} toto</p>
         </div>
         <div class="post_panel">
           <button class="comment_button button">Comment</button>
@@ -39,6 +56,7 @@ export default {
   name: "Post",
   data: function () {
     return {
+      mode: "watch",
       myId: sessionStorage.getItem("userId"),
       myRole: sessionStorage.getItem("userRole"),
     };
@@ -48,7 +66,12 @@ export default {
   },
 
   methods: {
-    getUser(post) {},
+    SwitchToModify: function () {
+      this.mode = "modify";
+    },
+    switchToWatch: function () {
+      this.mode = "watch";
+    },
 
     formatDate: function (value) {
       moment.locale("fr");
@@ -63,6 +86,20 @@ export default {
         .catch((error) => {
           self.$toast.error("Erreur lors de la récupération des posts");
           console.log(error);
+        });
+    },
+    modifyPost: function (id) {
+      const self = this;
+      this.$store
+        .dispatch("deletePost", id)
+        .then(() => {
+          self.$toast.success("Publication supprimée");
+        })
+        .catch((err) => {
+          if (err.message == "Request failed with status code 405") {
+            self.$toast.error("Vous n'avez pas les droits suffisant");
+          }
+          self.$toast.error("Erreur lors de la suppression");
         });
     },
 

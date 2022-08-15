@@ -3,6 +3,7 @@
   <section class="flexcol centercenter new_post_parent">
     <div class="container_new_post card_border flexcol card">
       <h1>Rédigez votre publication</h1>
+
       <input
         v-model="title"
         type="text"
@@ -10,6 +11,7 @@
         placeholder="Titre"
         class="post_title"
       />
+
       <textarea
         v-model="content"
         type="textarea"
@@ -22,7 +24,7 @@
         v-on:keyup="countdown"
       />
       <p class="caracter_limit">{{ remainingCount }}</p>
-      <button @click="createPost" class="submit" type="submit">
+      <button @click="sendPost" class="submit" type="submit">
         <span>Publier</span>
       </button>
     </div>
@@ -31,7 +33,7 @@
 <script>
 import Header from "../components/Header.vue";
 export default {
-  name: "newPost",
+  name: "PostformModify",
   components: {
     Header,
   },
@@ -44,29 +46,32 @@ export default {
       remainingCount: 280,
     };
   },
+  props: ["id", "title", "content"],
+
   methods: {
     countdown: function () {
       this.remainingCount = this.maxCount - this.content.length;
       this.hasError = this.remainingCount < 0;
     },
-    createPost: function () {
+    sendPost: function () {
       const myId = sessionStorage.getItem("userId");
-      console.log(myId);
       const self = this;
       const formData = new FormData();
       formData.append("title", this.title);
       formData.append("content", this.content);
       formData.append("user_id", myId);
+
       console.log(formData);
-      //formData.append("file", this.file);
+
       this.$store
-        .dispatch("createPost", formData)
+        .dispatch("modifyPost", { postId: this.id, postInfos: formData })
         .then(() => {
           self.$router.push("/posts");
-          self.$toast.success("Votre post est maintenant visible");
+          self.$toast.success("Votre post a bien été modifié");
         })
         .catch((err) => {
-          self.$toast.error("Erreur lors de la création du post");
+          self.$router.push("/posts");
+          self.$toast.error("Erreur lors de la modification du post");
           console.log(err);
         });
     },
