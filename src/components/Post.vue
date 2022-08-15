@@ -2,21 +2,24 @@
   <div v-if="posts.length > 0">
     <div v-for="(post, index) in posts" :key="index">
       <div class="post card_border">
-        <div class="post_admin">
+        <div v-if="post.user_id == myId || myRole == 1" class="post_admin">
           <button class="admin_post_button">modify</button>
-          <button class="admin_post_button">delete</button>
+          <button @click="deletePost(post.id)" class="admin_post_button">
+            delete
+          </button>
         </div>
         <div class="post_header">
-          <h3>toto</h3>
-          <p>Date</p>
+          <h3>{{ post.title }}</h3>
+          <div class="owner flexcol">
+            <p>Publié le {{ formatDate(post.created_at) }}</p>
+
+            <p>par {{ post.user.email }}</p>
+          </div>
         </div>
         <hr class="post_hr" />
         <div class="post_content">
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo
-            deleniti possimus, iusto dicta aperiam nam modi ducimus aliquam
-            ratione autem placeat aspernatur accusantium ab odio quae
-            consectetur vero? Dolorem, magni.
+            {{ post.content }}
           </p>
         </div>
         <div class="post_panel">
@@ -31,36 +34,67 @@
   </div>
 </template>
 <script>
+import moment from "moment";
 export default {
   name: "Post",
   data: function () {
+    return {
+      myId: sessionStorage.getItem("userId"),
+      myRole: sessionStorage.getItem("userRole"),
+    };
+  },
+  mounted: function () {
     this.getPosts();
   },
-  props: {
-    user: Object,
-  },
+
   methods: {
+    getUser(post) {},
+
+    formatDate: function (value) {
+      moment.locale("fr");
+      return moment(value).format("dddd Do MMMM YYYY");
+    },
+
     getPosts() {
       const self = this;
       this.$store
         .dispatch("getPosts")
         .then()
-        .catch(
-          (error) => console.log(error)
-          //self.$toast.error("Erreur lors de la récupération des posts")
-        );
+        .catch((error) => {
+          self.$toast.error("Erreur lors de la récupération des posts");
+          console.log(error);
+        });
+    },
+
+    deletePost: function (id) {
+      const self = this;
+      this.$store
+        .dispatch("deletePost", id)
+        .then(() => {
+          self.$toast.success("Publication supprimée");
+        })
+        .catch((err) => {
+          if (err.message == "Request failed with status code 405") {
+            self.$toast.error("Vous n'avez pas les droits suffisant");
+          }
+          self.$toast.error("Erreur lors de la suppression");
+        });
     },
   },
   computed: {
     posts() {
       return this.$store.getters.getPosts;
     },
+    user() {
+      return this.$store.getters.getUserInfos;
+    },
   },
 };
 </script>
 <style>
 .post {
-  width: 40%;
+  margin-top: 40px;
+  width: 600px;
   padding: 1% 3% 3% 3%;
 }
 .post_header {
@@ -101,6 +135,7 @@ export default {
   justify-content: flex-end;
 }
 .admin_post_button {
+  cursor: pointer;
   font-family: "Raleway", sans-serif;
   border: none;
   background-color: white;

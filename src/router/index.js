@@ -20,6 +20,9 @@ const routes = [
     path: "/newpost",
     name: "Newpost",
     component: Newpost,
+    meta: {
+      needsAuth: true
+    }
   }
 
 ];
@@ -29,24 +32,14 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach((to, from, next) => {
-//   if (to.meta.needsAuth) {
-//     next("/");
-//   } else {
-//     next();
-//   }
-// });
 
-//router.beforeEach(async (to, from) => {
-//  if (
-//    // make sure the user is authenticated
-//    !isAuthenticated &&
-//    // ❗️ Avoid an infinite redirect
-//    to.name !== '/'
-//  ) {
-//    // redirect the user to the login page
-//    return { name: 'Login' }
-//  }
-//})
+router.beforeEach((to, from, next) => {
+  if (to.fullPath === '/posts' || to.fullPath === '/newpost') {
+    if (!sessionStorage.getItem('token')) {
+      next('/');
+    }
+  }
+  next();
+});
 
 export default router;

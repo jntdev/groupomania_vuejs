@@ -25,27 +25,17 @@ export default {
   methods: {
     logout: function () {
       this.$store.commit("logout");
+      console.log("toto");
       this.$router.push("/");
     },
     newPost: function () {
       this.$router.push("/newpost");
     },
-    //getPosts() {
-    //  const self = this;
-    //  this.$store
-    //    .dispatch("getPosts")
-    //    .then()
-    //    .catch(() =>
-    //      self.$toast.error("Erreur lors de la récupération des posts")
-    //    );
-    //},
   },
   computed: {
-    posts() {
-      return this.$store.getters.getPosts;
-    },
-    //aller chercher le store
-    //aller chercher la bonne fonction
+    // posts() {
+    //   return this.$store.getters.getPosts;
+    // },
   },
 };
 </script>

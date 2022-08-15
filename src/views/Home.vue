@@ -69,7 +69,8 @@ export default {
     };
   },
   mounted: function () {
-    if (this.$store.state.user.userId != -1) {
+    console.log(this.$store.state.user.userId);
+    if (this.$store.state.user.id != -1) {
       this.$router.push("/posts");
       return;
     }
@@ -100,9 +101,7 @@ export default {
         })
         .then(
           function () {
-            console.log("toto");
             self.$router.push("/posts");
-            console.log("tato");
           },
           function (error) {
             if (error.message == "Request failed with status code 400") {
@@ -125,6 +124,7 @@ export default {
         .then(
           function () {
             self.login();
+
             self.$router.push("/posts");
           },
           function (error) {
@@ -187,7 +187,8 @@ input {
   height: 45px;
   width: 300px;
   border-radius: 5px;
-  border: 1px solid rgba(176, 88, 88, 0.55);
+  border: 1px solid rgb(255, 0, 0);
+  background-color: white;
 }
 .submit {
   border: none;

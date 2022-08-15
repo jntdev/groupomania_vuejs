@@ -1,7 +1,7 @@
 <template>
   <Header />
   <section class="flexcol centercenter new_post_parent">
-    <div class="container_new_post flexcol card">
+    <div class="container_new_post card_border flexcol card">
       <h1>Rédigez votre publication</h1>
       <input
         v-model="title"
@@ -37,12 +37,11 @@ export default {
   },
   data() {
     return {
+      title: "",
+      content: "",
+      owner_id: "",
       maxCount: 280,
       remainingCount: 280,
-      post: {
-        title: "",
-        content: "",
-      },
     };
   },
   methods: {
@@ -51,22 +50,25 @@ export default {
       this.hasError = this.remainingCount < 0;
     },
     createPost: function () {
+      const myId = sessionStorage.getItem("userId");
+      console.log(myId);
+      const self = this;
+      const formData = new FormData();
+      formData.append("title", this.title);
+      formData.append("content", this.content);
+      formData.append("user_id", myId);
+      console.log(formData);
+      //formData.append("file", this.file);
       this.$store
-        .dispatch("newPost", {
-          title: this.title,
-          content: this.content,
+        .dispatch("createPost", formData)
+        .then(() => {
+          self.$router.push("/posts");
+          self.$toast.success("Votre post est maintenant visible");
         })
-        .then(
-          function () {
-            console.log("newpost ok");
-            //
-            //  self.$router.push("/posts");
-            //
-          },
-          function (error) {
-            console.log(error);
-          }
-        );
+        .catch((err) => {
+          self.$toast.error("Erreur lors de la création du post");
+          console.log(err);
+        });
     },
   },
   computed: {},

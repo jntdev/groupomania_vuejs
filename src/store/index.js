@@ -34,18 +34,23 @@ const store = createStore({
         status: '',
         user: user,
         userInfos: {
+            id: '',
             email: '',
-            password: '',
+            is_admin: '',
         },
+        postsList: [],
     },
     mutations: {
         setStatus: function (state, status) {
             state.status = status;
         },
         logUser: function (state, user) {
-            //isAuthenticated == false;
             instance.defaults.headers.common['Authorization'] = user.token;
-            sessionStorage.setItem('user', JSON.stringify(user));
+            sessionStorage.setItem('user', JSON.stringify(user.user));
+            sessionStorage.setItem('userId', JSON.stringify(user.user.id));
+            sessionStorage.setItem('userEmail', JSON.stringify(user.user.email));
+            sessionStorage.setItem('userRole', JSON.stringify(user.user.is_admin));
+            sessionStorage.setItem('token', JSON.stringify(user.token));
             state.user = user;
         },
         userInfos: function (state, userInfos) {
@@ -55,11 +60,26 @@ const store = createStore({
             state.user = {
                 userId: -1,
                 token: '',
+                is_admin: '',
             }
-            sessionStorage.removeItem('user');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('userEmail');
+            sessionStorage.removeItem('userRole');
+            sessionStorage.removeItem('userId');
         },
         setPostsList: function (state, data) {
             state.postsList = data;
+        },
+        addPostOnList: function (state, postCreated) {
+            postCreated.postedBy = {
+                userId: state.user.id,
+                userContact: state.user.email,
+            };
+            state.postsList.unshift(postCreated);
+        },
+        deletePostOnList: function (state, postId) {
+            const index = state.postsList.findIndex((post) => post.id === postId);
+            state.postsList.splice(index, 1);
         },
     },
     actions: {
@@ -104,11 +124,9 @@ const store = createStore({
         getPosts: ({ commit }) => {
             commit("setStatus", "loading");
             return new Promise((resolve, reject) => {
-                console.log(instance);
                 instance
                     .get(`/posts`)
                     .then((response) => {
-                        console.log(response);
                         commit("setStatus", "");
                         commit("setPostsList", response.data);
                         resolve();
@@ -119,6 +137,58 @@ const store = createStore({
                     });
             });
         },
-    }
+        createPost: ({ commit }, postInfos) => {
+            commit("setStatus", "loading");
+            return new Promise((resolve, reject) => {
+                instance
+                    .post(`posts/`, postInfos)
+                    .then((response) => {
+                        //commit("addPostOnList", response.data.newPost);
+                        commit("setStatus", "");
+                        resolve();
+                    })
+                    .catch(() => {
+                        commit("setStatus", "");
+                        reject();
+                    });
+            });
+        },
+        deletePost: ({ commit }, postId) => {
+            commit("setStatus", "loading");
+            return new Promise((resolve, reject) => {
+                instance
+                    .delete(`posts/${postId}`)
+                    .then(() => {
+                        commit("deletePostOnList", postId);
+                        commit("setStatus", "");
+                        resolve();
+                    })
+                    .catch((err) => {
+                        commit("setStatus", "");
+                        reject(err.message);
+
+
+
+                    });
+            });
+        },
+    },
+    getters: {
+        getUserInfos: (state) => {
+            return state.user;
+        },
+
+        getPosts: (state) => {
+            return state.postsList;
+        },
+    },
 });
+
+
+
+instance.interceptors.request.use(
+    (instance.defaults.headers.common[
+        "Authorization"
+    ] = sessionStorage.getItem("token"))
+);
 export default store;
