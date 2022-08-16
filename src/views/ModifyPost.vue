@@ -10,6 +10,7 @@
         placeholder="Titre"
         class="post_title"
       />
+      
       <textarea
         v-model="content"
         type="textarea"
@@ -22,7 +23,7 @@
         v-on:keyup="countdown"
       />
       <p class="caracter_limit">{{ remainingCount }}</p>
-      <button @click="createPost" class="submit" type="submit">
+      <button @click="modifyPost(id)" class="submit" type="submit">
         <span>Publier</span>
       </button>
     </div>
@@ -31,34 +32,33 @@
 <script>
 import Header from "../components/Header.vue";
 export default {
-  name: "newPost",
+  name: "ModifyPost",
   components: {
     Header,
   },
   data() {
     return {
-      title: "",
-      content: "",
       owner_id: "",
       maxCount: 280,
       remainingCount: 280,
     };
+  },
+  props: ["id", "title", "content"],
+  mounted: function () {
   },
   methods: {
     countdown: function () {
       this.remainingCount = this.maxCount - this.content.length;
       this.hasError = this.remainingCount < 0;
     },
-    createPost: function () {
-      const myId = sessionStorage.getItem("userId");
+    modifyPost: function (id) {
       const self = this;
       const formData = new FormData();
       formData.append("title", this.title);
       formData.append("content", this.content);
-      formData.append("user_id", myId);
       //formData.append("file", this.file);
       this.$store
-        .dispatch("createPost", formData)
+        .dispatch("modifyPost", { postId: id, postInfos: formData })
         .then(() => {
           self.$router.push("/posts");
           self.$toast.success("Votre post est maintenant visible");

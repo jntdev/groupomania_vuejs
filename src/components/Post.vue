@@ -3,13 +3,20 @@
     <div v-for="(post, index) in posts" :key="index">
       <div class="post card_border">
         <div v-if="post.user_id == myId || myRole == 1" class="post_admin">
-          <button class="admin_post_button">modify</button>
+          <router-link :to="{name : 'ModifyPost', 
+          params:{
+            id: post.id, 
+            title: post.title, 
+            content: post.content}}">
+            <button class="admin_post_button">modify</button>
+          </router-link>
           <button @click="deletePost(post.id)" class="admin_post_button">
             delete
           </button>
         </div>
         <div class="post_header">
           <h3>{{ post.title }}</h3>
+
           <div class="owner flexcol">
             <p>Publié le {{ formatDate(post.created_at) }}</p>
 
@@ -18,16 +25,17 @@
         </div>
         <hr class="post_hr" />
         <div class="post_content">
-          <p>
-            {{ post.content }}
-          </p>
+          {{post.content }}
         </div>
         <div class="post_panel">
-          <button class="comment_button button">Comment</button>
-          <div class="likes">
-            <button>Like</button>
-            <button>Dislike</button>
-          </div>
+            
+              <button @click="toggleLike(post.id)">
+               <span v-if="post.liked_by != null && JSON.parse( post.liked_by ).includes(parseInt(myId))">Dislike</span> 
+               <span v-else>like</span>
+              </button>
+              <div v-if="post.liked_by.length-2 == 0">Soyez le premier à liker la publication !</div>
+              <div v-if="post.liked_by.length-2 == 1"> {{post.liked_by.length-2}} Like</div>
+              <div v-if="i =JSON.parse(post.liked_by).length > 1"> {{JSON.parse(post.liked_by).length}} Likes</div>
         </div>
       </div>
     </div>
@@ -35,6 +43,7 @@
 </template>
 <script>
 import moment from "moment";
+import { mapState } from "vuex";
 export default {
   name: "Post",
   data: function () {
@@ -46,9 +55,7 @@ export default {
   mounted: function () {
     this.getPosts();
   },
-
   methods: {
-    getUser(post) {},
 
     formatDate: function (value) {
       moment.locale("fr");
@@ -57,15 +64,15 @@ export default {
 
     getPosts() {
       const self = this;
-      this.$store
-        .dispatch("getPosts")
-        .then()
-        .catch((error) => {
-          self.$toast.error("Erreur lors de la récupération des posts");
-          console.log(error);
-        });
+      this.$store.dispatch("getPosts").then(()=> {
+        
+      })
+      
+      .catch((error) => {
+        self.$toast.error("Erreur lors de la récupération des posts");
+        console.log(error);
+      });
     },
-
     deletePost: function (id) {
       const self = this;
       this.$store
@@ -80,7 +87,28 @@ export default {
           self.$toast.error("Erreur lors de la suppression");
         });
     },
-  },
+    toggleLike: function (id) {
+      
+      const myId = sessionStorage.getItem("userId");
+      const self = this;
+
+      this.$store
+        .dispatch("toggleLike", {
+          user_id: myId,
+          post_id: id,
+        })
+        .then(() => {
+          self.getPosts();
+        })
+        .catch(() => {
+          self.$toast.error("Votre action n'a pas été prise en compte");
+        });
+    },
+   
+    },
+
+    
+  
   computed: {
     posts() {
       return this.$store.getters.getPosts;
@@ -88,6 +116,8 @@ export default {
     user() {
       return this.$store.getters.getUserInfos;
     },
+
+    ...mapState(["status"]),
   },
 };
 </script>

@@ -66,10 +66,11 @@ export default {
       mode: "login",
       email: "",
       password: "",
+      regexEmail: /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/,
+      regexPassword: /(?=^.{7,}$)(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).*/,
     };
   },
   mounted: function () {
-    console.log(this.$store.state.user.userId);
     if (this.$store.state.user.id != -1) {
       this.$router.push("/posts");
       return;

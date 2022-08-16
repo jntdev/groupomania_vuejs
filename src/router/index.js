@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import Posts from "../views/Posts.vue";
 import Newpost from "../views/Newpost.vue";
+import Modifypost from "../views/ModifyPost.vue"
 const routes = [
   {
     path: "/",
@@ -23,6 +24,15 @@ const routes = [
     meta: {
       needsAuth: true
     }
+  },
+  {
+    path: "/modifyPost/:id",
+    name: "ModifyPost",
+    component: Modifypost,
+    meta: {
+      needsAuth: true
+    },
+    props: true
   }
 
 ];

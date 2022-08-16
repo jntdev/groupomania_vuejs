@@ -25,7 +25,6 @@ export default {
   methods: {
     logout: function () {
       this.$store.commit("logout");
-      console.log("toto");
       this.$router.push("/");
     },
     newPost: function () {

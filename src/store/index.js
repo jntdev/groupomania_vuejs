@@ -1,8 +1,6 @@
 import { createStore } from "vuex";
 
-
 const axios = require('axios');
-
 const instance = axios.create({
     baseURL: 'http://127.0.0.1:3333/api/',
     headers: {
@@ -39,6 +37,7 @@ const store = createStore({
             is_admin: '',
         },
         postsList: [],
+        likesList:[]
     },
     mutations: {
         setStatus: function (state, status) {
@@ -71,16 +70,21 @@ const store = createStore({
             state.postsList = data;
         },
         addPostOnList: function (state, postCreated) {
-            postCreated.postedBy = {
-                userId: state.user.id,
-                userContact: state.user.email,
-            };
+
             state.postsList.unshift(postCreated);
+        },
+        setlikesList: function (state, data) {
+            state.likesList = data;
+        },
+        addLikeOnList: function (state, likeCreated) {
+
+            state.likesList.unshift(likeCreated);
         },
         deletePostOnList: function (state, postId) {
             const index = state.postsList.findIndex((post) => post.id === postId);
             state.postsList.splice(index, 1);
         },
+
     },
     actions: {
         login: ({ commit }, userInfos) => {
@@ -129,6 +133,7 @@ const store = createStore({
                     .then((response) => {
                         commit("setStatus", "");
                         commit("setPostsList", response.data);
+                        console.log(response.data)
                         resolve();
                     })
                     .catch(() => {
@@ -143,6 +148,7 @@ const store = createStore({
                 instance
                     .post(`posts/`, postInfos)
                     .then((response) => {
+                        console.log(response)
                         //commit("addPostOnList", response.data.newPost);
                         commit("setStatus", "");
                         resolve();
@@ -150,6 +156,23 @@ const store = createStore({
                     .catch(() => {
                         commit("setStatus", "");
                         reject();
+                    });
+            });
+        },
+       modifyPost: ({ commit }, { postId, postInfos }) => {
+        console.log(postId)
+        console.log(postInfos)
+            commit("setStatus", "loading");
+            return new Promise((resolve, reject) => {
+                instance
+                    .post(`posts/${postId}`, postInfos)
+                    .then(() => {
+                        commit("setStatus", "");
+                        resolve();
+                    })
+                    .catch((err) => {
+                        commit("setStatus", "");
+                        reject(err.message);
                     });
             });
         },
@@ -166,9 +189,37 @@ const store = createStore({
                     .catch((err) => {
                         commit("setStatus", "");
                         reject(err.message);
-
-
-
+                    });
+            });
+        },
+        getLikeList: ({ commit }) => {
+            commit("setStatus", "loading");
+            return new Promise((resolve, reject) => {
+                instance
+                    .get(`/likes`)
+                    .then((response) => {
+                        commit("setStatus", "");
+                        console.log(response.data)
+                        resolve();
+                    })
+                    .catch(() => {
+                        commit("setStatus", "");
+                        reject(error);
+                    });
+            });
+        },
+        toggleLike: ({ commit }, likeInfos) => {
+            return new Promise((resolve, reject) => {
+                instance
+                    .post(`post/likes/`, likeInfos)
+                    .then((response) => {
+                        //console.log(response.data)
+                        
+                        console.log(response.data)
+                        resolve();
+                    })
+                    .catch(() => {
+                        reject();
                     });
             });
         },
@@ -183,9 +234,6 @@ const store = createStore({
         },
     },
 });
-
-
-
 instance.interceptors.request.use(
     (instance.defaults.headers.common[
         "Authorization"
