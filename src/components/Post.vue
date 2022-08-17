@@ -1,8 +1,9 @@
 <template>
   <div v-if="posts.length > 0">
-    <div v-for="(post, index) in posts" :key="index">
+    <div class ="flex centercenter" v-for="(post, index) in posts" :key="index">
       <div class="post card_border">
         <div v-if="post.user_id == myId || myRole == 1" class="post_admin">
+         
           <router-link :to="{name : 'ModifyPost', 
           params:{
             id: post.id, 
@@ -16,27 +17,32 @@
         </div>
         <div class="post_header">
           <h3>{{ post.title }}</h3>
-
+  
           <div class="owner flexcol">
             <p>Publié le {{ formatDate(post.created_at) }}</p>
-
             <p>par {{ post.user.email }}</p>
           </div>
         </div>
         <hr class="post_hr" />
-        <div class="post_content">
+        <div class="post_content flex" v-if="post.img_url !=''">
+          <img :src="post.img_url" alt="">
+          {{post.content }}
+        </div>
+        <div class="post_content flex" v-else>
           {{post.content }}
         </div>
         <div class="post_panel">
             
-              <button @click="toggleLike(post.id)">
-               <span v-if="post.liked_by != null && JSON.parse( post.liked_by ).includes(parseInt(myId))">Dislike</span> 
-               <span v-else>like</span>
+              <button class="toggleLike" @click="toggleLike(post.id)">
+               <img v-if="post.liked_by != null && JSON.parse( post.liked_by ).includes(parseInt(myId))" src="@/assets/liked.png"/>
+              <img v-else src="@/assets/unliked.png"/>
               </button>
-              <div v-if="post.liked_by.length-2 == 0">Soyez le premier à liker la publication !</div>
-              <div v-if="post.liked_by.length-2 == 1"> {{post.liked_by.length-2}} Like</div>
-              <div v-if="i =JSON.parse(post.liked_by).length > 1"> {{JSON.parse(post.liked_by).length}} Likes</div>
+              
+              
         </div>
+        <div class="likes_count" v-if="post.liked_by.length-2 == 0">Soyez le premier à liker la publication !</div>
+              <div class="likes_count" v-if="post.liked_by.length-2 == 1"> {{post.liked_by.length-2}} Like</div>
+        <div class="likes_count"  v-if="i =JSON.parse(post.liked_by).length > 1"> {{JSON.parse(post.liked_by).length}} Likes</div>
       </div>
     </div>
   </div>
@@ -110,6 +116,7 @@ export default {
     
   
   computed: {
+    
     posts() {
       return this.$store.getters.getPosts;
     },
@@ -121,10 +128,12 @@ export default {
   },
 };
 </script>
-<style>
+<style lang="scss">
+@import '@/assets/scss/_vars.scss';
 .post {
   margin-top: 40px;
-  width: 600px;
+  width: 50%;
+  min-width: 400px;
   padding: 1% 3% 3% 3%;
 }
 .post_header {
@@ -132,15 +141,28 @@ export default {
   align-items: center;
   justify-content: space-between;
 }
+.toggleLike{
+  background: none;
+  border: none;
+  img{
+    height: 50px;
+  }
+}
+
+.owner{
+  p{
+    margin: 0;
+  }
+}
 .post_hr {
   width: 80%;
   margin-left: 0;
   border: 0;
   background-image: linear-gradient(
     90deg,
-    rgba(0, 0, 0, 1) 0%,
+    $thirdColor 0%,
     rgba(122, 0, 0, 1) 20%,
-    rgba(255, 0, 0, 1) 40%
+    $primaryColor 40%
   );
   height: 2px;
 }
@@ -149,16 +171,24 @@ export default {
   justify-content: space-between;
   margin-top: 40px;
 }
+.likes_count{
+  text-align: end;
+}
 .button {
   font-family: "Raleway", sans-serif;
   font-size: 20px;
   background-color: rgb(255, 255, 255);
-  border-color: red;
+  border-color: $primaryColor;
   border-radius: 40px;
-  color: rgb(0, 0, 0);
+  color: $thirdColor;
 }
-.comment_button {
-  padding: 1.2% 4%;
+.post_content{
+  align-items: flex-start;
+  img{
+    width: 150px;
+    margin-right: 40px;
+  }
+  
 }
 .post_admin {
   display: flex;
@@ -169,6 +199,45 @@ export default {
   font-family: "Raleway", sans-serif;
   border: none;
   background-color: white;
-  color: red;
+  color: $primaryColor;
+}
+@media (max-width: 1060px) {
+  .post{
+    width: 80%;
+  }
+}
+
+@media (max-width: 980px) {
+.post{
+   flex-direction: column;
+   
+}
+
+.post_content{
+   flex-direction: column;
+   align-items: center;
+   img{
+     margin-bottom: 40px;
+     margin-right: 0;
+     width: 100%
+   }
+}
+
+.post_hr{
+  
+  width: 100%;
+}
+}
+@media (max-width: 630px) {
+   .post_header{
+      flex-direction: column;
+    }
+}
+@media (max-width: 500px) {
+  
+  .post{
+    min-width: unset;
+    width: 90%;
+  }
 }
 </style>

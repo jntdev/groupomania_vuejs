@@ -3,6 +3,7 @@
     <div class="hero"></div>
   </section>
   <section class="login_section">
+    {{API_SERVICE_URL}}
     <div class="card">
       <div class="tabs" v-if="mode == 'login'">
         <div class="tab connexion_tab">
@@ -15,19 +16,31 @@
       <div class="tabs" v-if="mode == 'create'">
         <div class="tab connexion_tab" @click="switchToLogin">
           <h2>Connexion</h2>
+          
         </div>
         <div class="tab register_tab">
           <h2 class="activ">S'enregistrer</h2>
         </div>
       </div>
-      <div class="form">
-        <input v-model="email" type="text" name="email" placeholder="  Email" />
-        <input
-          v-model="password"
-          type="password"
-          name="password"
-          placeholder="  Mot de passe"
-        />
+      <div class="form" autocomplete="off">
+          <input autocomplete="false" name="hidden" type="text" style="display:none;">
+        <div class="emailField">
+          <input v-model="email" type="text" name="email" placeholder="Email" autocomplete="off" />
+        </div>
+        
+        <div class="passwordField">
+            <input
+            v-model="password"
+            type="password"
+            name="password"
+            placeholder="Mot de passe"
+            autocomplete="off"
+            />
+            <p class="regexAlert" v-if="mode == 'create'" >
+              minimum 7 caractères
+            </p>
+        </div>
+        
 
         <button
           @click="login"
@@ -38,6 +51,7 @@
           <span v-if="status === 'loading'">Connexion en cours...</span>
           <span v-else>Se connecter</span>
         </button>
+        
         <button
           @click="createAccount"
           class="submit"
@@ -63,11 +77,12 @@ export default {
   name: "Home",
   data: function () {
     return {
+      API_SERVICE_URL: process.env.API_SERVICE_URL,
       mode: "login",
       email: "",
       password: "",
       regexEmail: /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/,
-      regexPassword: /(?=^.{7,}$)(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).*/,
+      regexPassword: /.[^"'`]{7,}/,
     };
   },
   mounted: function () {
@@ -95,6 +110,14 @@ export default {
     },
     login: function () {
       const self = this;
+      if (!this.regexEmail.test(this.email)) {
+        self.$toast.error("Email non valide");
+        return;
+      }
+      if (!this.regexPassword.test(this.password)) {
+        self.$toast.error("Sécurité du mot de passe insuffisante");
+        return;
+      }
       this.$store
         .dispatch("login", {
           email: this.email,
@@ -105,18 +128,23 @@ export default {
             self.$router.push("/posts");
           },
           function (error) {
-            if (error.message == "Request failed with status code 400") {
-              self.$toast.error("Email ou mot de passe incorrect");
-            } else {
-              self.$toast.error(
-                "Une erreur est survenue, veuillez rééssayer plus tard."
-              );
-            }
+            error.message == "Request failed with status code 400" ?
+              self.$toast.error("Le mot de passe est incorrect"):
+              self.$toast.error(error.message)
+           console.log(error)
           }
         );
     },
     createAccount: function () {
       const self = this;
+      if (!this.regexEmail.test(this.email)) {
+        self.$toast.error("Email non valide");
+        return;
+      }
+      if (!this.regexPassword.test(this.password)) {
+        self.$toast.error("Sécurité du mot de passe insuffisante");
+        return;
+      }
       this.$store
         .dispatch("createAccount", {
           email: this.email,
@@ -124,19 +152,34 @@ export default {
         })
         .then(
           function () {
+           
             self.login();
 
             self.$router.push("/posts");
           },
           function (error) {
-            console.log(error);
-          }
+            error.message == "Request failed with status code 422" ?
+              self.$toast.error("Adresse mail déja enregistrée"):
+              self.$toast.error(error.message)
+              console.log(error);
+            }
+            
+          
         );
     },
   },
 };
 </script>
-<style>
+<style lang="scss">
+@import '@/assets/scss/_vars.scss';
+
+/* Change the white to any color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
 .hero {
   height: 400px;
   width: 100%;
@@ -144,7 +187,7 @@ export default {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 20% 50%;
-}
+ }
 .login_section {
   height: 30vh;
   display: flex;
@@ -160,11 +203,23 @@ export default {
 .form {
   display: flex;
   border-radius: 0 15px 15px 15px;
-  box-shadow: 5px 7px 15px -5px #000000;
+  box-shadow: 5px 7px 15px -5px $thirdColor;
   padding: 20% 20% 10% 20%;
   flex-direction: column;
   justify-content: space-around;
   height: 250px;
+}
+
+.passwordField{
+  position: relative;
+}
+
+.regexAlert{
+  position: absolute;
+  color: black;
+  bottom : -35px;
+ 
+  
 }
 .tabs {
   width: 100%;
@@ -178,22 +233,22 @@ export default {
   cursor: pointer;
 }
 h2 {
-  color: rgb(0, 0, 0);
+  color: $thirdColor;
 }
 .activ {
-  color: red;
+  color: $primaryColor;
 }
 input {
   font-family: "raleway";
   height: 45px;
   width: 300px;
   border-radius: 5px;
-  border: 1px solid rgb(255, 0, 0);
+  border: 1px solid $primaryColor;
   background-color: white;
 }
 .submit {
   border: none;
-  background: red;
+  background-color: $primaryColor;
   border-radius: 8px;
   padding: 4%;
   font-family: "Raleway", sans-serif;
@@ -201,9 +256,26 @@ input {
   color: white;
   align-self: flex-end;
 }
+
+.submit:hover{
+  background-color: $thirdColor;
+}
+
 .disabled {
   border: 1px solid #999999;
   background-color: #cccccc;
   color: #666666;
+}
+
+@media (max-width: 700px) {
+  .form{
+    box-shadow: none;
+    padding:0;
+  }
+  .hero{
+    background-position: 70% 50%;;
+  }
+  
+  
 }
 </style>

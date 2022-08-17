@@ -136,7 +136,7 @@ const store = createStore({
                         console.log(response.data)
                         resolve();
                     })
-                    .catch(() => {
+                    .catch((error) => {
                         commit("setStatus", "");
                         reject(error);
                     });
@@ -153,9 +153,9 @@ const store = createStore({
                         commit("setStatus", "");
                         resolve();
                     })
-                    .catch(() => {
+                    .catch((error) => {
                         commit("setStatus", "");
-                        reject();
+                        reject(error);
                     });
             });
         },
