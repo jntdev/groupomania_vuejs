@@ -3,7 +3,6 @@
     <div class="hero"></div>
   </section>
   <section class="login_section">
-    {{API_SERVICE_URL}}
     <div class="card">
       <div class="tabs" v-if="mode == 'login'">
         <div class="tab connexion_tab">
@@ -77,7 +76,6 @@ export default {
   name: "Home",
   data: function () {
     return {
-      API_SERVICE_URL: process.env.API_SERVICE_URL,
       mode: "login",
       email: "",
       password: "",

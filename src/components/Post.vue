@@ -8,7 +8,8 @@
           params:{
             id: post.id, 
             title: post.title, 
-            content: post.content}}">
+            content: post.content,
+            }}">
             <button class="admin_post_button">modify</button>
           </router-link>
           <button @click="deletePost(post.id)" class="admin_post_button">
@@ -26,10 +27,10 @@
         <hr class="post_hr" />
         <div class="post_content flex" v-if="post.img_url !=''">
           <img :src="post.img_url" alt="">
-          {{post.content }}
+          <p>{{post.content}}</p>
         </div>
         <div class="post_content flex" v-else>
-          {{post.content }}
+          <p>{{post.content}}</p>
         </div>
         <div class="post_panel">
             
@@ -71,18 +72,18 @@ export default {
     getPosts() {
       const self = this;
       this.$store.dispatch("getPosts").then(()=> {
-        
       })
-      
       .catch((error) => {
         self.$toast.error("Erreur lors de la récupération des posts");
         console.log(error);
       });
     },
     deletePost: function (id) {
+      const myId = sessionStorage.getItem("userId");
       const self = this;
+      self.checkIfICan();
       this.$store
-        .dispatch("deletePost", id)
+        .dispatch("deletePost", { postId: id,  myId })
         .then(() => {
           self.$toast.success("Publication supprimée");
         })
@@ -91,6 +92,16 @@ export default {
             self.$toast.error("Vous n'avez pas les droits suffisant");
           }
           self.$toast.error("Erreur lors de la suppression");
+        });
+    },
+    checkIfICan: function(){
+      const myId = sessionStorage.getItem("userId");
+      const formData = new FormData();
+      formData.append("myid", myId);
+      this.$store
+        .dispatch("checkIfICan",  FormData)
+        .catch((err) => {
+          console.log(err.message)
         });
     },
     toggleLike: function (id) {
@@ -185,7 +196,7 @@ export default {
 .post_content{
   align-items: flex-start;
   img{
-    width: 150px;
+    width: 300px;
     margin-right: 40px;
   }
   
@@ -215,7 +226,6 @@ export default {
 
 .post_content{
    flex-direction: column;
-   align-items: center;
    img{
      margin-bottom: 40px;
      margin-right: 0;

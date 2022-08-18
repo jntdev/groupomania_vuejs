@@ -1,3 +1,4 @@
+
 import { createStore } from "vuex";
 
 const axios = require('axios');
@@ -44,7 +45,7 @@ const store = createStore({
             state.status = status;
         },
         logUser: function (state, user) {
-            instance.defaults.headers.common['Authorization'] = user.token;
+            instance.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
             sessionStorage.setItem('user', JSON.stringify(user.user));
             sessionStorage.setItem('userId', JSON.stringify(user.user.id));
             sessionStorage.setItem('userEmail', JSON.stringify(user.user.email));
@@ -61,10 +62,8 @@ const store = createStore({
                 token: '',
                 is_admin: '',
             }
-            sessionStorage.removeItem('token');
-            sessionStorage.removeItem('userEmail');
-            sessionStorage.removeItem('userRole');
-            sessionStorage.removeItem('userId');
+            sessionStorage.clear();
+      window.location.reload();
         },
         setPostsList: function (state, data) {
             state.postsList = data;
@@ -72,13 +71,6 @@ const store = createStore({
         addPostOnList: function (state, postCreated) {
 
             state.postsList.unshift(postCreated);
-        },
-        setlikesList: function (state, data) {
-            state.likesList = data;
-        },
-        addLikeOnList: function (state, likeCreated) {
-
-            state.likesList.unshift(likeCreated);
         },
         deletePostOnList: function (state, postId) {
             const index = state.postsList.findIndex((post) => post.id === postId);
@@ -117,17 +109,24 @@ const store = createStore({
                     });
             });
         },
-        getUserInfos: ({ commit }) => {
-            instance.post('/infos')
-                .then(function (response) {
-                    commit('userInfos', response.data.infos);
-                })
-                .catch(function () {
-                });
+        checkIfICan: ({commit},myid) => {
+            console.log(myid)
+            return new Promise((resolve, reject) => {
+                instance.post(`/users/me/`, myid)
+                    .then((response) => {
+                        console.log(response.data)
+                        resolve();
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+            });
         },
+        
         getPosts: ({ commit }) => {
             commit("setStatus", "loading");
             return new Promise((resolve, reject) => {
+                console.log(instance.defaults.headers.common['Authorization'])
                 instance
                     .get(`/posts`)
                     .then((response) => {
@@ -176,11 +175,12 @@ const store = createStore({
                     });
             });
         },
-        deletePost: ({ commit }, postId) => {
+        deletePost: ({ commit }, { postId, myId }) => {
             commit("setStatus", "loading");
             return new Promise((resolve, reject) => {
+                console.log(myId)
                 instance
-                    .delete(`posts/${postId}`)
+                    .delete(`posts/${postId}`, myId)
                     .then(() => {
                         commit("deletePostOnList", postId);
                         commit("setStatus", "");
@@ -189,22 +189,6 @@ const store = createStore({
                     .catch((err) => {
                         commit("setStatus", "");
                         reject(err.message);
-                    });
-            });
-        },
-        getLikeList: ({ commit }) => {
-            commit("setStatus", "loading");
-            return new Promise((resolve, reject) => {
-                instance
-                    .get(`/likes`)
-                    .then((response) => {
-                        commit("setStatus", "");
-                        console.log(response.data)
-                        resolve();
-                    })
-                    .catch(() => {
-                        commit("setStatus", "");
-                        reject(error);
                     });
             });
         },

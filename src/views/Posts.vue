@@ -36,9 +36,6 @@ export default {
       this.$store.commit("logout");
       this.$router.push("/");
     },
-    newPost: function () {
-      this.$router.push("/newpost");
-    },
   },
   computed: {
   },

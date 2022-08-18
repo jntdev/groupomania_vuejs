@@ -23,6 +23,9 @@
         v-on:keyup="countdown"
       />
       <p class="caracter_limit">{{ remainingCount }}</p>
+      <input id="file" type="file" @change="onFileSelected">
+      <label for="file">Uploadez un fichier</label>
+      <p class="facultatif">*N'importez pas d'image si vous ne souhaitez pas la modifier</p>
       <button @click="modifyPost(id)" class="submit" type="submit">
         <span>Publier</span>
       </button>
@@ -51,11 +54,27 @@ export default {
       this.remainingCount = this.maxCount - this.content.length;
       this.hasError = this.remainingCount < 0;
     },
+    onFileSelected: function(e){
+      const file = e.target.files[0];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png"
+      ];
+      if (allowedTypes.includes(file.type)) {
+        this.file = file;
+        this.url = URL.createObjectURL(file);
+      } else {
+        
+        this.$toast.error("Type de fichier inconnu");
+      } 
+    },
     modifyPost: function (id) {
       const self = this;
       const formData = new FormData();
       formData.append("title", this.title);
       formData.append("content", this.content);
+      formData.append("file", this.file);
       //formData.append("file", this.file);
       this.$store
         .dispatch("modifyPost", { postId: id, postInfos: formData })
