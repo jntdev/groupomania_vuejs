@@ -8,7 +8,7 @@ export default {
 </script>
 <style lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Raleway&display=swap");
-@import '@/assets/scss/_vars.scss';
+@import "@/assets/scss/_vars.scss";
 
 body {
   font-family: "Raleway", sans-serif;
@@ -21,7 +21,6 @@ body {
   display: flex;
   align-items: center;
 }
-
 .flexcol {
   display: flex;
   flex-direction: column;
@@ -34,7 +33,7 @@ body {
   border-radius: 0 15px 15px 15px;
   box-shadow: 5px 7px 15px -5px $thirdColor;
 }
-button{
+button {
   cursor: pointer;
 }
 </style>

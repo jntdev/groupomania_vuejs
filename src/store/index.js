@@ -18,7 +18,7 @@ if (!user) {
 } else {
     try {
         user = JSON.parse(user);
-        instance.defaults.headers.common['Authorization'] = user.token;
+        instance.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
     } catch (ex) {
         user = {
             userId: -1,
@@ -37,8 +37,7 @@ const store = createStore({
             email: '',
             is_admin: '',
         },
-        postsList: [],
-        likesList:[]
+        postsList: []
     },
     mutations: {
         setStatus: function (state, status) {
@@ -63,7 +62,7 @@ const store = createStore({
                 is_admin: '',
             }
             sessionStorage.clear();
-      window.location.reload();
+            window.location.reload();
         },
         setPostsList: function (state, data) {
             state.postsList = data;
@@ -76,7 +75,6 @@ const store = createStore({
             const index = state.postsList.findIndex((post) => post.id === postId);
             state.postsList.splice(index, 1);
         },
-
     },
     actions: {
         login: ({ commit }, userInfos) => {
@@ -109,30 +107,30 @@ const store = createStore({
                     });
             });
         },
-        checkIfICan: ({commit},myid) => {
-            console.log(myid)
+        checkIfICan: ({ commit }, myId) => {
+            commit("setStatus", "loading");
             return new Promise((resolve, reject) => {
-                instance.post(`/users/me/`, myid)
-                    .then((response) => {
-                        console.log(response.data)
-                        resolve();
+                commit;
+                instance.post(`users/checkifican/${myId}`)
+                    .then(function (response) {
+                        sessionStorage.setItem('token', JSON.stringify(response.data.token));
+                        commit('setStatus', 'created');
+                        resolve(response);
                     })
-                    .catch((err) => {
-                        reject(err);
+                    .catch(function (error) {
+                        commit('setStatus', 'error_create');
+                        reject(error);
                     });
             });
         },
-        
         getPosts: ({ commit }) => {
             commit("setStatus", "loading");
             return new Promise((resolve, reject) => {
-                console.log(instance.defaults.headers.common['Authorization'])
                 instance
                     .get(`/posts`)
                     .then((response) => {
                         commit("setStatus", "");
                         commit("setPostsList", response.data);
-                        console.log(response.data)
                         resolve();
                     })
                     .catch((error) => {
@@ -146,9 +144,7 @@ const store = createStore({
             return new Promise((resolve, reject) => {
                 instance
                     .post(`posts/`, postInfos)
-                    .then((response) => {
-                        console.log(response)
-                        //commit("addPostOnList", response.data.newPost);
+                    .then(() => {
                         commit("setStatus", "");
                         resolve();
                     })
@@ -158,9 +154,7 @@ const store = createStore({
                     });
             });
         },
-       modifyPost: ({ commit }, { postId, postInfos }) => {
-        console.log(postId)
-        console.log(postInfos)
+        modifyPost: ({ commit }, { postId, postInfos }) => {
             commit("setStatus", "loading");
             return new Promise((resolve, reject) => {
                 instance
@@ -178,7 +172,6 @@ const store = createStore({
         deletePost: ({ commit }, { postId, myId }) => {
             commit("setStatus", "loading");
             return new Promise((resolve, reject) => {
-                console.log(myId)
                 instance
                     .delete(`posts/${postId}`, myId)
                     .then(() => {
@@ -196,10 +189,7 @@ const store = createStore({
             return new Promise((resolve, reject) => {
                 instance
                     .post(`post/likes/`, likeInfos)
-                    .then((response) => {
-                        //console.log(response.data)
-                        
-                        console.log(response.data)
+                    .then(() => {
                         resolve();
                     })
                     .catch(() => {
@@ -224,3 +214,10 @@ instance.interceptors.request.use(
     ] = sessionStorage.getItem("token"))
 );
 export default store;
+
+
+
+
+
+
+

@@ -1,49 +1,68 @@
 <template>
   <div v-if="posts.length > 0">
-    <div class ="flex centercenter" v-for="(post, index) in posts" :key="index">
+    <div class="flex centercenter" v-for="(post, index) in posts" :key="index">
       <div class="post card_border">
         <div v-if="post.user_id == myId || myRole == 1" class="post_admin">
-         
-          <router-link :to="{name : 'ModifyPost', 
-          params:{
-            id: post.id, 
-            title: post.title, 
-            content: post.content,
-            }}">
+          <router-link
+            :to="{
+              name: 'ModifyPost',
+              params: {
+                id: post.id,
+                title: post.title,
+                content: post.content,
+                owner_id: post.user_id,
+              },
+            }"
+          >
             <button class="admin_post_button">modify</button>
           </router-link>
-          <button @click="deletePost(post.id)" class="admin_post_button">
+          <button
+            @click="deletePost(post.id, post.user_id)"
+            class="admin_post_button"
+          >
             delete
           </button>
         </div>
         <div class="post_header">
           <h3>{{ post.title }}</h3>
-  
+
           <div class="owner flexcol">
             <p>Publié le {{ formatDate(post.created_at) }}</p>
             <p>par {{ post.user.email }}</p>
           </div>
         </div>
         <hr class="post_hr" />
-        <div class="post_content flex" v-if="post.img_url !=''">
-          <img :src="post.img_url" alt="">
-          <p>{{post.content}}</p>
+        <div class="post_content flex" v-if="post.img_url != ''">
+          <img :src="post.img_url" alt="" />
+          <p>{{ post.content }}</p>
         </div>
         <div class="post_content flex" v-else>
-          <p>{{post.content}}</p>
+          <p>{{ post.content }}</p>
         </div>
         <div class="post_panel">
-            
-              <button class="toggleLike" @click="toggleLike(post.id)">
-               <img v-if="post.liked_by != null && JSON.parse( post.liked_by ).includes(parseInt(myId))" src="@/assets/liked.png"/>
-              <img v-else src="@/assets/unliked.png"/>
-              </button>
-              
-              
+          <button class="toggleLike" @click="toggleLike(post.id)">
+            <img
+              v-if="
+                post.liked_by != null &&
+                JSON.parse(post.liked_by).includes(parseInt(myId))
+              "
+              src="@/assets/liked.png"
+            />
+            <img v-else src="@/assets/unliked.png" />
+          </button>
         </div>
-        <div class="likes_count" v-if="post.liked_by.length-2 == 0">Soyez le premier à liker la publication !</div>
-              <div class="likes_count" v-if="post.liked_by.length-2 == 1"> {{post.liked_by.length-2}} Like</div>
-        <div class="likes_count"  v-if="i =JSON.parse(post.liked_by).length > 1"> {{JSON.parse(post.liked_by).length}} Likes</div>
+        <div class="likes_count" v-if="post.liked_by.length - 2 == 0">
+          Soyez le premier à liker la publication !
+        </div>
+        <div class="likes_count" v-if="post.liked_by.length - 2 == 1">
+          {{ post.liked_by.length - 2 }} Like
+        </div>
+        <div
+          class="likes_count"
+          v-if="(i = JSON.parse(post.liked_by).length > 1)"
+        >
+          {{ JSON.parse(post.liked_by).length }} Likes
+        </div>
       </div>
     </div>
   </div>
@@ -63,52 +82,37 @@ export default {
     this.getPosts();
   },
   methods: {
-
     formatDate: function (value) {
       moment.locale("fr");
       return moment(value).format("dddd Do MMMM YYYY");
     },
-
     getPosts() {
       const self = this;
-      this.$store.dispatch("getPosts").then(()=> {
-      })
-      .catch((error) => {
-        self.$toast.error("Erreur lors de la récupération des posts");
-        console.log(error);
+      this.$store
+        .dispatch("getPosts")
+        .then(() => {})
+        .catch((error) => {
+          self.$toast.error("Erreur lors de la récupération des posts");
+        });
+    },
+    deletePost: function (id, userId) {
+      const myId = sessionStorage.getItem("userId");
+      const self = this;
+      this.$store.dispatch("checkIfICan", myId).then((res) => {
+        console.log(res.data);
+        if (res.data.isAdmin == 1 || res.data.id == userId) {
+          this.$store.dispatch("deletePost", { postId: id, myId }).then(() => {
+            self.$toast.success("Publication supprimée");
+          });
+        } else {
+          sessionStorage.setItem("userRole", JSON.stringify(0));
+          self.$toast.error("Vous n'avez pas les droits necessaires");
+        }
       });
     },
-    deletePost: function (id) {
-      const myId = sessionStorage.getItem("userId");
-      const self = this;
-      self.checkIfICan();
-      this.$store
-        .dispatch("deletePost", { postId: id,  myId })
-        .then(() => {
-          self.$toast.success("Publication supprimée");
-        })
-        .catch((err) => {
-          if (err.message == "Request failed with status code 405") {
-            self.$toast.error("Vous n'avez pas les droits suffisant");
-          }
-          self.$toast.error("Erreur lors de la suppression");
-        });
-    },
-    checkIfICan: function(){
-      const myId = sessionStorage.getItem("userId");
-      const formData = new FormData();
-      formData.append("myid", myId);
-      this.$store
-        .dispatch("checkIfICan",  FormData)
-        .catch((err) => {
-          console.log(err.message)
-        });
-    },
     toggleLike: function (id) {
-      
       const myId = sessionStorage.getItem("userId");
       const self = this;
-
       this.$store
         .dispatch("toggleLike", {
           user_id: myId,
@@ -121,26 +125,20 @@ export default {
           self.$toast.error("Votre action n'a pas été prise en compte");
         });
     },
-   
-    },
-
-    
-  
+  },
   computed: {
-    
     posts() {
       return this.$store.getters.getPosts;
     },
     user() {
       return this.$store.getters.getUserInfos;
     },
-
     ...mapState(["status"]),
   },
 };
 </script>
 <style lang="scss">
-@import '@/assets/scss/_vars.scss';
+@import "@/assets/scss/_vars.scss";
 .post {
   margin-top: 40px;
   width: 50%;
@@ -152,16 +150,15 @@ export default {
   align-items: center;
   justify-content: space-between;
 }
-.toggleLike{
+.toggleLike {
   background: none;
   border: none;
-  img{
+  img {
     height: 50px;
   }
 }
-
-.owner{
-  p{
+.owner {
+  p {
     margin: 0;
   }
 }
@@ -182,7 +179,7 @@ export default {
   justify-content: space-between;
   margin-top: 40px;
 }
-.likes_count{
+.likes_count {
   text-align: end;
 }
 .button {
@@ -193,13 +190,12 @@ export default {
   border-radius: 40px;
   color: $thirdColor;
 }
-.post_content{
+.post_content {
   align-items: flex-start;
-  img{
+  img {
     width: 300px;
     margin-right: 40px;
   }
-  
 }
 .post_admin {
   display: flex;
@@ -212,40 +208,39 @@ export default {
   background-color: white;
   color: $primaryColor;
 }
+
 @media (max-width: 1060px) {
-  .post{
+  .post {
     width: 80%;
   }
 }
 
 @media (max-width: 980px) {
-.post{
-   flex-direction: column;
-   
-}
+  .post {
+    flex-direction: column;
+  }
 
-.post_content{
-   flex-direction: column;
-   img{
-     margin-bottom: 40px;
-     margin-right: 0;
-     width: 100%
-   }
-}
-
-.post_hr{
-  
-  width: 100%;
-}
-}
-@media (max-width: 630px) {
-   .post_header{
-      flex-direction: column;
+  .post_content {
+    flex-direction: column;
+    img {
+      margin-bottom: 40px;
+      margin-right: 0;
+      width: 100%;
     }
+  }
+  .post_hr {
+    width: 100%;
+  }
 }
+
+@media (max-width: 630px) {
+  .post_header {
+    flex-direction: column;
+  }
+}
+
 @media (max-width: 500px) {
-  
-  .post{
+  .post {
     min-width: unset;
     width: 90%;
   }

@@ -1,7 +1,10 @@
 <template>
   <Header />
   <section class="flexcol centercenter new_post_parent">
-    <div id="container_new_post" class="container_new_post card_border flexcol card">
+    <div
+      id="container_new_post"
+      class="container_new_post card_border flexcol card"
+    >
       <h1>Rédigez votre publication</h1>
       <input
         v-model="title"
@@ -22,8 +25,8 @@
         v-on:keyup="countdown"
       />
       <p class="caracter_limit">{{ remainingCount }}</p>
-      <input id="file" type="file" @change="onFileSelected">
-      <label for="file">Uploadez un fichier</label>
+      <input id="file" type="file" @change="onFileSelected" />
+      <label id="inputLabel" for="file">Uploadez un fichier</label>
       <p class="facultatif">*facultatif</p>
       <button @click="createPost" class="submit" type="submit">
         <span>Envoyer</span>
@@ -53,22 +56,20 @@ export default {
       this.remainingCount = this.maxCount - this.content.length;
       this.hasError = this.remainingCount < 0;
     },
-    onFileSelected: function(e){
+    onFileSelected: function (e) {
       const file = e.target.files[0];
-      const allowedTypes = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png"
-      ];
+      console.log(file);
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+
       if (allowedTypes.includes(file.type)) {
         this.file = file;
         this.url = URL.createObjectURL(file);
+        document.getElementById("inputLabel").innerHTML = file.name;
       } else {
-        
         this.$toast.error("Type de fichier inconnu");
-      } 
+      }
     },
-    createPost: function () {
+    createPost: function (e) {
       const myId = sessionStorage.getItem("userId");
       const self = this;
       const formData = new FormData();
@@ -77,18 +78,25 @@ export default {
       formData.append("file", this.file);
       formData.append("user_id", myId);
       //formData.append("file", this.file);
-      this.$store
-        .dispatch("createPost", formData)
-        .then(() => {
-          self.$router.push("/posts");
-          self.$toast.success("Votre post est maintenant visible");
-        })
-        .catch((err) => {
-          err.message == "Request failed with status code 422" ?
-          self.$toast.error("Vous devez remplir le formulaire"):
-          self.$toast.error("Erreur lors de la création du post");
-          console.log(err.message);
-        });
+      if (this.file != null && this.file.size > 1800000) {
+        console.log(e);
+        e.preventDefault();
+        this.$toast.error("Le fichier ne doit pas dépasser 1.8mo");
+        return;
+      } else {
+        this.$store
+          .dispatch("createPost", formData)
+          .then(() => {
+            self.$router.push("/posts");
+            self.$toast.success("Votre post est maintenant visible");
+          })
+          .catch((err) => {
+            err.message == "Request failed with status code 422"
+              ? self.$toast.error("Vous devez remplir le formulaire")
+              : self.$toast.error("Erreur lors de la création du post");
+            console.log(err.message);
+          });
+      }
     },
   },
   computed: {
@@ -103,10 +111,10 @@ export default {
 };
 </script>
 <style lang="scss">
-@import '@/assets/scss/_vars.scss';
+@import "@/assets/scss/_vars.scss";
 .new_post_parent {
   height: 80vh;
-  padding:5%
+  padding: 5%;
 }
 .container_new_post {
   justify-content: space-around;
@@ -134,52 +142,49 @@ export default {
     margin: 0;
   }
 }
-#file{
+#file {
   width: 0.1px;
-	height: 0.1px;
-	opacity: 0;
-	overflow: hidden;
-	position: absolute;
-	z-index: -1;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
 }
 #file + label {
-    font-size: 1.25em;
-    font-weight: 700;
-    color: white;
-    background-color: $secondaryColor;
-    border-radius: 5px;
-    padding: 2%;
-    display: inline-block;
-    cursor: pointer;
+  font-size: 1.25em;
+  font-weight: 700;
+  color: white;
+  background-color: $secondaryColor;
+  border-radius: 5px;
+  padding: 2%;
+  display: inline-block;
+  cursor: pointer;
 }
-.facultatif{
-  margin:0
+.facultatif {
+  margin: 0;
 }
 
 #file:focus + label,
 #file + label:hover {
-    background-color: $primaryColor;
+  background-color: $primaryColor;
 }
 
 @media (max-width: 1200px) {
   #container_new_post {
     height: 600px;
-    
-
   }
   .new_post_content {
-      height: 200px;
-    }
+    height: 200px;
+  }
 }
+
 @media (max-width: 800px) {
-  #container_new_post{
+  #container_new_post {
     border: none;
     box-shadow: none;
   }
-    .new_post_content {
-      height: 300px;
-    }
-
-  
+  .new_post_content {
+    height: 300px;
+  }
 }
 </style>
