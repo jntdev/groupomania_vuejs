@@ -15,31 +15,38 @@
       <div class="tabs" v-if="mode == 'create'">
         <div class="tab connexion_tab" @click="switchToLogin">
           <h2>Connexion</h2>
-          
         </div>
         <div class="tab register_tab">
           <h2 class="activ">S'enregistrer</h2>
         </div>
       </div>
       <div class="form" autocomplete="off">
-          <input autocomplete="false" name="hidden" type="text" style="display:none;">
+        <input
+          autocomplete="false"
+          name="hidden"
+          type="text"
+          style="display: none"
+        />
         <div class="emailField">
-          <input v-model="email" type="text" name="email" placeholder="Email" autocomplete="off" />
+          <input
+            v-model="email"
+            type="text"
+            name="email"
+            placeholder="Email"
+            autocomplete="off"
+          />
         </div>
-        
+
         <div class="passwordField">
-            <input
+          <input
             v-model="password"
             type="password"
             name="password"
             placeholder="Mot de passe"
             autocomplete="off"
-            />
-            <p class="regexAlert" v-if="mode == 'create'" >
-              minimum 7 caractères
-            </p>
+          />
+          <p class="regexAlert" v-if="mode == 'create'">minimum 7 caractères</p>
         </div>
-        
 
         <button
           @click="login"
@@ -50,7 +57,7 @@
           <span v-if="status === 'loading'">Connexion en cours...</span>
           <span v-else>Se connecter</span>
         </button>
-        
+
         <button
           @click="createAccount"
           class="submit"
@@ -126,10 +133,9 @@ export default {
             self.$router.push("/posts");
           },
           function (error) {
-            error.message == "Request failed with status code 400" ?
-              self.$toast.error("Le mot de passe est incorrect"):
-              self.$toast.error(error.message)
-           console.log(error)
+            error.message == "Request failed with status code 400"
+              ? self.$toast.error("Le mot de passe est incorrect")
+              : self.$toast.error(error.message);
           }
         );
     },
@@ -150,33 +156,29 @@ export default {
         })
         .then(
           function () {
-           
             self.login();
 
             self.$router.push("/posts");
           },
           function (error) {
-            error.message == "Request failed with status code 422" ?
-              self.$toast.error("Adresse mail déja enregistrée"):
-              self.$toast.error(error.message)
-              console.log(error);
-            }
-            
-          
+            error.message == "Request failed with status code 422"
+              ? self.$toast.error("Adresse mail déja enregistrée")
+              : self.$toast.error(error.message);
+          }
         );
     },
   },
 };
 </script>
 <style lang="scss">
-@import '@/assets/scss/_vars.scss';
+@import "@/assets/scss/_vars.scss";
 
 /* Change the white to any color */
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active{
-    -webkit-box-shadow: 0 0 0 30px white inset !important;
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
 .hero {
   height: 400px;
@@ -185,7 +187,7 @@ input:-webkit-autofill:active{
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 20% 50%;
- }
+}
 .login_section {
   height: 30vh;
   display: flex;
@@ -207,17 +209,13 @@ input:-webkit-autofill:active{
   justify-content: space-around;
   height: 250px;
 }
-
-.passwordField{
+.passwordField {
   position: relative;
 }
-
-.regexAlert{
+.regexAlert {
   position: absolute;
   color: black;
-  bottom : -35px;
- 
-  
+  bottom: -35px;
 }
 .tabs {
   width: 100%;
@@ -254,11 +252,9 @@ input {
   color: white;
   align-self: flex-end;
 }
-
-.submit:hover{
+.submit:hover {
   background-color: $thirdColor;
 }
-
 .disabled {
   border: 1px solid #999999;
   background-color: #cccccc;
@@ -266,14 +262,12 @@ input {
 }
 
 @media (max-width: 700px) {
-  .form{
+  .form {
     box-shadow: none;
-    padding:0;
+    padding: 0;
   }
-  .hero{
-    background-position: 70% 50%;;
+  .hero {
+    background-position: 70% 50%;
   }
-  
-  
 }
 </style>

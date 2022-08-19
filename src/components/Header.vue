@@ -3,8 +3,16 @@
   <nav id="header">
     <img class="header_logo" src="../assets/header.png" alt="" />
     <ul class="header_list">
-     <li><router-link class="header_link" to="/posts">Fil d'actualité</router-link></li> 
-     <li><router-link @click="logout()" class="header_link" to="/">Déconnexion</router-link></li>
+      <li>
+        <router-link class="header_link" to="/posts"
+          >Fil d'actualité</router-link
+        >
+      </li>
+      <li>
+        <router-link @click="logout()" class="header_link" to="/"
+          >Déconnexion</router-link
+        >
+      </li>
     </ul>
   </nav>
   <hr class="border_nav" />
@@ -20,26 +28,24 @@ export default {
     logout: function () {
       this.$store.commit("logout");
       this.$router.push("/");
-    }
+    },
   },
   computed: {},
 };
 </script>
 <style lang="scss">
-@import '@/assets/scss/_vars.scss';
+@import "@/assets/scss/_vars.scss";
 #header {
   width: 100%;
-
   padding-top: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  ul{
+  ul {
     padding: 0;
-    li{
+    li {
       list-style: none;
     }
-    
   }
 }
 .border_nav {
@@ -71,52 +77,49 @@ export default {
 }
 
 @media (max-width: 980px) {
-  .border_nav{
+  .border_nav {
     width: 100%;
   }
 }
 
 @media (max-width: 850px) {
-  #header{
+  #header {
     .header_logo {
-  margin-left: 0;
-  height: 80px;
-}
+      margin-left: 0;
+      height: 80px;
+    }
     flex-direction: column;
     justify-content: space-between;
-    ul{
+    ul {
       padding: 0;
       margin: 0;
     }
-    
-    
   }
-  
   .header_list {
     width: 70%;
     justify-content: space-between;
   }
 }
+
 @media (max-width: 585px) {
   .header_list {
     width: 100%;
     flex-direction: column;
     align-items: center;
-    
-    li{
+
+    li {
       text-align: center;
       width: 100%;
       padding-bottom: 20px;
       padding-top: 20px;
       border-top: solid 1px $thirdColor;
     }
-    li:hover{
+    li:hover {
       background-color: $secondaryColor;
-
     }
   }
-  .border_nav{
-      margin: 0;
+  .border_nav {
+    margin: 0;
   }
 }
 </style>
