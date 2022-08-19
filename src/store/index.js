@@ -27,7 +27,6 @@ if (!user) {
     }
 }
 
-// Create a new store instance.
 const store = createStore({
     state: {
         status: '',
